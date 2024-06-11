@@ -28,18 +28,18 @@ function ToastProvider({ children }) {
   }
 
   // // remove the last toast after 5 seconds
-  // React.useEffect(() => {
-  //   const lastToast = toastList[toastList.length - 1];
-  //   if (lastToast) {
-  //     const timeoutId = setTimeout(() => {
-  //       removeToastWithId(lastToast.id);
-  //     }, 5000);
+  React.useEffect(() => {
+    const lastToast = toastList[toastList.length - 1];
+    if (lastToast) {
+      const timeoutId = setTimeout(() => {
+        removeToastWithId(lastToast.id);
+      }, 5000);
 
-  //     return () => {
-  //       clearTimeout(timeoutId);
-  //     };
-  //   }
-  // }, [toastList]);
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [toastList]);
 
   React.useEffect(() => {
     function handleKeyDown(event) {
