@@ -2,17 +2,17 @@ import React from "react";
 
 import Button from "../Button";
 import ToastShelf from "../ToastShelf";
+import { ToastProviderContext } from "../ToastProvider";
 
 import styles from "./ToastPlayground.module.css";
 
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 
 function ToastPlayground() {
-  // simple default to have something when we start.
-  const [toasts, setToasts] = React.useState([]);
-
   const [message, setMessage] = React.useState("");
   const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
+  const { toastList, createToast, removeToastWithId } =
+    React.useContext(ToastProviderContext);
 
   function handleCreateToast(event) {
     event.preventDefault();
@@ -21,28 +21,11 @@ function ToastPlayground() {
       return;
     }
 
-    const nextToasts = [
-      ...toasts,
-      {
-        id: crypto.randomUUID(),
-        message,
-        variant,
-      },
-    ];
-
-    setToasts(nextToasts);
+    createToast(message, variant);
 
     // reset to defaults after creating toast
     setMessage("");
-    setVariant(VARIANT_OPTIONS[0]);
-  }
-
-  function handleDismiss(id) {
-    const nextToasts = toasts.filter((toast) => {
-      return toast.id !== id;
-    });
-
-    setToasts(nextToasts);
+    //setVariant(VARIANT_OPTIONS[0]); // don't reset variant type.
   }
 
   return (
@@ -52,7 +35,7 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
+      <ToastShelf />
 
       <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
         <div className={styles.row}>

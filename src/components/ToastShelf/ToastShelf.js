@@ -1,9 +1,15 @@
 import React from "react";
 
 import Toast from "../Toast";
+import { ToastProviderContext } from "../ToastProvider";
 import styles from "./ToastShelf.module.css";
 
-function ToastShelf({ toasts, handleDismiss }) {
+function ToastShelf({}) {
+  const { toastList, createToast, removeToastWithId } =
+    React.useContext(ToastProviderContext);
+
+  const toasts = toastList;
+
   return (
     <ol className={styles.wrapper}>
       {toasts.map((toast) => (
@@ -11,7 +17,7 @@ function ToastShelf({ toasts, handleDismiss }) {
           <Toast
             id={toast.id}
             variant={toast.variant}
-            handleDismiss={handleDismiss}
+            handleDismiss={removeToastWithId}
           >
             {toast.message}
           </Toast>
