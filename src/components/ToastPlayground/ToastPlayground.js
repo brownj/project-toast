@@ -1,95 +1,113 @@
 import React from "react";
+
 import Button from "../Button";
-import Toast from "../Toast";
 import ToastShelf from "../ToastShelf";
+
 import styles from "./ToastPlayground.module.css";
 
-export const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
+const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 
 function ToastPlayground() {
-  const [toastOpen, setToastOpen] = React.useState(false);
-  const [selectedToastType, setSelectedToastType] = React.useState("");
-  const [toastList, setToastList] = React.useState(null);
+  // simple default to have something when we start.
+  const [toasts, setToasts] = React.useState([]);
 
-  React.useEffect(() => {
-    setSelectedToastType(VARIANT_OPTIONS[0]);
-  }, []);
+  const [message, setMessage] = React.useState("");
+  const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
 
-  function handleAddToastClick() {
-    console.log("toast now should be open");
-    setToastOpen(true);
+  function handleCreateToast(event) {
+    event.preventDefault();
+
+    if (!message) {
+      return;
+    }
+
+    const nextToasts = [
+      ...toasts,
+      {
+        id: crypto.randomUUID(),
+        message,
+        variant,
+      },
+    ];
+
+    setToasts(nextToasts);
+
+    // reset to defaults after creating toast
+    setMessage("");
+    setVariant(VARIANT_OPTIONS[0]);
+  }
+
+  function handleDismiss(id) {
+    const nextToasts = toasts.filter((toast) => {
+      return toast.id !== id;
+    });
+
+    setToasts(nextToasts);
   }
 
   return (
-    <>
-      <div className={styles.wrapper}>
-        <header>
-          <img alt="Cute toast mascot" src="/toast.png" />
-          <h1>Toast Playground</h1>
-        </header>
+    <div className={styles.wrapper}>
+      <header>
+        <img alt="Cute toast mascot" src="/toast.png" />
+        <h1>Toast Playground</h1>
+      </header>
 
-        {toastOpen && (
-          <Toast
-            toastType={selectedToastType}
-            setToastOpen={setToastOpen}
-          ></Toast>
-        )}
+      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
 
-        <ToastShelf />
-
-        <div className={styles.controlsWrapper}>
-          <div className={styles.row}>
-            <label
-              htmlFor="message"
-              className={styles.label}
-              style={{ alignSelf: "baseline" }}
-            >
-              Message
-            </label>
-            <div className={styles.inputWrapper}>
-              <textarea id="message" className={styles.messageInput} />
-            </div>
+      <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
+        <div className={styles.row}>
+          <label
+            htmlFor="message"
+            className={styles.label}
+            style={{ alignSelf: "baseline" }}
+          >
+            Message
+          </label>
+          <div className={styles.inputWrapper}>
+            <textarea
+              id="message"
+              className={styles.messageInput}
+              value={message}
+              onChange={(event) => {
+                setMessage(event.target.value);
+              }}
+            />
           </div>
+        </div>
 
-          <div className={styles.row}>
-            <div className={styles.label}>
-              Variant - current: {selectedToastType}
-            </div>
+        <div className={styles.row}>
+          <div className={styles.label}>Variant</div>
+          <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
             {VARIANT_OPTIONS.map((option) => {
-              const componentName = "variant-" + option;
-              const checked = option === selectedToastType;
+              const id = `variant-${option}`;
+
               return (
-                <div
-                  key={option}
-                  className={`${styles.inputWrapper} ${styles.radioWrapper}`}
-                >
-                  <label htmlFor={componentName}>
-                    <input
-                      id={componentName}
-                      type="radio"
-                      name={componentName}
-                      value={option}
-                      checked={checked}
-                      onChange={(event) => {
-                        setSelectedToastType(event.target.value);
-                      }}
-                    />
-                    {option}
-                  </label>
-                </div>
+                <label key={id} htmlFor={id}>
+                  <input
+                    id={id}
+                    type="radio"
+                    name="variant"
+                    value={option}
+                    checked={option === variant}
+                    onChange={(event) => {
+                      setVariant(event.target.value);
+                    }}
+                  />
+                  {option}
+                </label>
               );
             })}
           </div>
+        </div>
 
-          <div className={styles.row}>
-            <div className={styles.label} />
-            <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
-              <Button onClick={handleAddToastClick}>Pop Toast!</Button>
-            </div>
+        <div className={styles.row}>
+          <div className={styles.label} />
+          <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
+            <Button>Pop Toast!</Button>
           </div>
         </div>
-      </div>
-    </>
+      </form>
+    </div>
   );
 }
 
