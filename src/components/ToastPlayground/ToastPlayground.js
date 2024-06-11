@@ -64,7 +64,7 @@ function ToastPlayground() {
             Message
           </label>
           <div className={styles.inputWrapper}>
-            <textarea
+            <input
               id="message"
               className={styles.messageInput}
               value={message}
